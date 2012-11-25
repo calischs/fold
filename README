@@ -1,0 +1,15 @@
+TODO: write this out.
+
+for now, try to think through dependencies:
+-python, pref 2.7
+-numpy
+-pstoedit
+-inkscape
+-ImageMagick
+
+
+Steps:
+1. Macports
+2. sudo port install python27 py27-numpy
+3. if you want a quick viewer: sudo port install ImageMagick
+4. If you want to convert to postscript and dxf: sudo port install pstoedit inkscape
