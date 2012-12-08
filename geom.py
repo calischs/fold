@@ -1,8 +1,7 @@
 #!/usr/bin/env python
+#geom utils
 from numpy import *
 from numpy import arctan2 as atan2
-
-
 
 def cross(a,b):
     return a[0]*b[1] - a[1]*b[0]
