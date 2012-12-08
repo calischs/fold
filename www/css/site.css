@@ -1,0 +1,161 @@
+@charset "UTF-8";
+
+@font-face {
+  font-family: dinRegular;
+  src: url('http://www.mit.edu/~calisch/fonts/DIN-Regular.ttf');
+}
+
+@font-face {
+  font-family: dinBlack;
+  src: url('http://www.mit.edu/~calisch/fonts/DIN-Black.ttf');
+}
+
+@font-face {
+  font-family: dinBold;
+  src: url('http://www.mit.edu/~calisch/fonts/DIN-Bold.ttf');
+}
+
+@font-face {
+  font-family: dinMedium;
+  src: url('http://www.mit.edu/~calisch/fonts/DIN-Medium.ttf');
+}
+
+/*body {background-color:#b0c4de;}*/
+body {background-color:#F7F7F7;}
+
+a:link {
+       text-decoration: none;
+       color:#666666;
+       margin-left: 0px;}
+a:visited {
+          text-decoration: none;
+          color:#666666;
+          margin-left: 0px;}
+a:active {
+         text-decoration: none;
+         color:#000000;
+         margin-left: 0px;}
+a:hover {
+        text-decoration: none;
+        color:#000000;
+        margin-left: 0px;}
+.link {
+      font-family: dinRegular, Geneva, Arial, Helvetica, sans-serif;
+      font-size: 16px;
+      color:#000000;
+      margin-top:0px;
+      margin-bottom:0px;
+      margin-left: 0px;}
+a.title{
+       font-family: dinRegular, Helvetica, Arial, Helvetica, sans-serif;
+       font-size: 24px;
+       margin-top:0px;
+       margin-bottom:0px;
+}
+.title {
+       font-family: dinRegular, Helvetica, Arial, Helvetica, sans-serif;
+       font-size: 24px;
+       margin-top:0px;
+       margin-bottom:0px;
+       float:left;
+}
+.subtitle {
+          font-family: dinRegular, Arial, Helvetica, sans-serif;
+          font-size: 20px;
+          margin-top:0px;
+          margin-bottom:0px;
+          float:left;
+}
+.name {
+          font-family: dinRegular, Arial, Helvetica, sans-serif;
+          font-size: 14px;
+          text-align:right;
+          margin-top:0px;
+          margin-bottom:0px;
+}
+.content_heading {
+                 font-family: dinMedium, Geneva, Arial, Helvetica, sans-serif;
+                 font-size: 20px;
+                 color:#000000;
+                 margin-left: 20px;
+                 margin-top:0px;
+                 margin-bottom:6px;}
+p {
+       font-family: dinRegular, Geneva, Arial, Helvetica, sans-serif;
+       font-size: 16px;
+       color:#222222;
+       margin-left: 40px;
+       margin-top:2px;
+       margin-bottom:2px;}
+
+p.bold{
+font-family: dinBold, Geneva, Arial, Helvetica, sans-serif;
+}
+ul{
+  list-style-type: none;
+  padding-left: 40px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin: 0px;
+}
+ul li{
+  font-family: dinRegular, Geneva, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color:#222222;
+  padding-left: 16px; 
+  padding-top: 2px;
+  padding-bottom: 3px;
+}     
+.footnote {
+       font-family: dinMedium, Geneva, Arial, Helvetica, sans-serif;
+       font-size: 14px;
+       color:#666666;
+       margin-left: 40px;
+       margin-top:0px;}
+
+img{
+  border-style: none;
+  border-width: 1px;
+  border-color: #5C646B;
+}
+
+img.alpha{
+  border-style: none;
+  background-color:#F7F7F7;
+}
+
+/*this is adapted from stack overflow*/
+code{font-family:Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
+  background-color:#666666;
+  width:800px;
+  color:#eeeeee;
+}
+code.inline{
+  font-family:Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
+  background-color:#F7F7F7;
+  color:#000000;
+  }
+pre{padding:20px;font-family:Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
+  padding-top:0px;
+  background-color:#666666;
+  width:90%;
+  margin-left: 5%;
+  overflow:auto;
+}
+
+table.text{
+  padding-left: 0px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin: 0px;
+}
+
+td{
+  font-family: dinRegular, Geneva, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color:#222222;
+  padding-left: 16px; 
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+}
