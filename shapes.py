@@ -2,7 +2,7 @@
 """\
 SVG.py - Construct/display SVG scenes.
 
-Adapted from:
+with influence from:
 http://code.activestate.com/recipes/325823-draw-svg-images-in-python/
 """
 
@@ -14,17 +14,26 @@ from geom import *
 def colorstr(rgb): return "#%x%x%x" % (rgb[0]/16,rgb[1]/16,rgb[2]/16)
 
 class Scene:
-    def __init__(self,name="svg",height=11,width=8.5,units="in"):
+    def __init__(self,name="svg",width=8.5,height=11,units="in",stroke_width=.005):
         self.name = name
         self.layers = []
         self.height = height
         self.width = width
         self.units = units
+        self.stroke_width = stroke_width
         return
+
+    #copy constructor
+    @classmethod
+    def from_scene(cls,other_scene,name): 
+        assert(name != other_scene.name)
+        return cls(name,other_scene.width,other_scene.height,other_scene.units,other_scene.stroke_width)
 
     def add_layer(self,layer): 
         self.layers.append(layer)
-
+    def add_layers(self,layers):
+        for layer in layers:
+            self.layers.append(layer)
     def add_group(self,group):
         for item,layer in group.items.iteritems():
             layer.add(item)
@@ -35,7 +44,7 @@ class Scene:
                "  height=\"%f%s\" width=\"%f%s\" \n" % (self.height,self.units,self.width,self.units),
                "  units=\"%s\"\n"%(self.units),
                "  viewBox=\"0 0 %f %f\">\n"%(self.width,self.height),
-               " <g fill=\"none\" stroke-width=\"%f\"\n"%(self.width/1000),
+               " <g fill=\"none\" stroke-width=\"%f\"\n"%(self.stroke_width),
                "    transform=\"translate(%f,%f) scale(1, -1)\">\n"%\
                (.5*self.width,.5*self.height)]
         for layer in self.layers: 
@@ -89,7 +98,19 @@ class Layer:
         var += [" </g>\n"]
         return var
 
-#this will allow instancing, transforms, etc. on a group
+    def mirror(self,p,v):
+        for i,item in enumerate(self.items):
+            self.items[i] = item.mirror(p,v)
+    def rotate(self,p,t):
+        for i,item in enumerate(self.items):
+            self.items[i] = item.rotate(p,t)
+    def translate(self,t):
+        for i,item in enumerate(self.items):
+            self.items[i] = item.translate(t)
+
+
+#this will allow instancing, transforms, etc. on a group while preserving layers
+#of input geometry through a dictionary
 class Group:
     def __init__(self,items=None):
         self.items={}
@@ -100,6 +121,11 @@ class Group:
     def add(self,items):
         for item,layer in items.iteritems():
             self.items[item] = layer
+
+    def add_group(self,group):
+        for item,layer in group.items.iteritems():
+            self.items[item] = layer
+
 
     def mirror(self,p,v,copy=False):
         new = {}
@@ -117,6 +143,13 @@ class Group:
                 new[item.rotate(p,t)] = layer
         return Group(new)
 
+    def rotates(self,p,ts):
+        new = {}
+        for t in ts:
+            for item,layer in self.items.iteritems():
+                    new[item.rotate(p,t)] = layer
+        return Group(new)
+
     def translate(self,ts,copy=False):
         new = {}
         if copy:
@@ -125,6 +158,7 @@ class Group:
             for item,layer in self.items.iteritems():
                 new[item.translate(t)] = layer
         return Group(new)
+
 
 #shape primitives
 class Line:
@@ -155,11 +189,30 @@ class Circle:
     def rotate(self,p,t): #rotate about p by t radians
         return Circle(rotate_p(asarray(self.center),p,t),self.radius)
     def mirror(self,p,v): #mirror about line through point p along vector v
-        return Circle(mirror_p(self.center,p,v),radius)
+        return Circle(mirror_p(self.center,p,v),self.radius)
 
     def strarray(self,s):
         return ["  <circle cx=\"%f\" cy=\"%f\" r=\"%f\"/>\n" %\
                 (self.center[0],self.center[1],self.radius)]
+
+class Ellipse:
+    def __init__(self,center,xr,yr,rot):
+        self.center = center
+        self.xr  = xr
+        self.yr = yr
+        self.rot = rot
+        return
+
+    def translate(self,v): #translate along v
+        return Ellipse(asarray(self.center)+asarray(v),self.xr,self.yr,self.rot)
+    def rotate(self,p,t): #rotate about p by t radians
+        return Ellipse(rotate_p(asarray(self.center),p,t),self.xr,self.yr,self.rot+t)
+    def mirror(self,p,v): #mirror about line through point p along vector v
+        return Ellipse(mirror_p(self.center,p,v),self.xr,self.yr, pi - self.rot)
+
+    def strarray(self,s):
+        return ["  <ellipse transform=\"rotate(-%f)\" cx=\"%f\" cy=\"%f\" rx=\"%f\" ry=\"%f\"/>\n" %\
+                (self.rot,self.center[0],self.center[1],self.xr,self.yr)]
 
 class Arc:
     #draws an arc with center, radius, ccw from th1 to th2
@@ -210,28 +263,14 @@ def test():
     scene = Scene('origami-test',8.5,8.5,'in')
     mtn = Layer('mountain',(0,0,255),scene)
     val = Layer('valley',(255,0,0),scene)
-    cut = Layer('cut',(255,0,255),scene)
-
-    mtn.add(Line([0,0],[1,1]))
-    mtn.add(Line([0,0],[-1,1]))
-    mtn.add(Line([0,0],[-1,-1]))
-    val.add(Line([0,0],[1,-1]))
-    mtn.add(Circle([0,0],1))
-    val.add(Circle([1,0],.5))
-    val.add(Circle([0,1],.5))
-    val.add(Arc([0,0],1.25,pi/4,3*pi/4))
-    cut.add(Arc.from_3_points([sqrt(3),1],[0.,2.],[-sqrt(3),1]))
-    cut.add(Arc.from_3_points([-sqrt(3),1],[-2.,0.],[-sqrt(3),-1]))
-    cut.add(Arc.from_3_points([-sqrt(3),-1],[0.,-2.],[sqrt(3),-1]))
-    cut.add(Arc.from_3_points([sqrt(3),-1],[2.,0.],[sqrt(3),1]))
-    mtn.add(Circle([0,0],2.))
-    cut.add(Line([-1,-1],[-1,1]))
-    l = Line([-4,0],[4,-4])
-    cut.add(l)
-    cut.add(l.mirror([0,0],[0,1]))
+    l = Line([0,0],[1,1])
+    c = Circle([0,0],sqrt(2))
+    g = Group({l:mtn, c:val})
+    t = 2*pi*arange(6)/6.
+    g = g.translate(2*sqrt(2)*dstack((cos(t),sin(t)))[0])
+    scene.add_group(g)
     scene.write_svg()
     scene.display()
-    scene.convert()
     return
 
 if __name__ == '__main__': test()
