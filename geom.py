@@ -21,3 +21,14 @@ def rotate_p(a,p,t):
     a = asarray(a)-p
     a = [a[0]*cos(t)-a[1]*sin(t), a[0]*sin(t)+a[1]*cos(t)]
     return a+p
+
+#compute line-line intersection
+def line_line_intersection(p0,v0,p1,v1):
+    if v0[1] - v0[0]*v1[1]/v1[0] == 0:
+        return None #no intersection
+    elif v1[0] != 0:
+        s = (p1[1]-p0[1] + v1[1]/v1[0]*(p0[0]-p1[0]))/(v0[1]-v0[0]*v1[1]/v1[0])
+        return p0+s*v0
+    else:
+        t = (p1[0]-p0[0] + v1[0]/v1[1]*(p0[1]-p1[1]))/(v0[0]-v0[1]*v1[0]/v1[1])
+        return p0+t*v0

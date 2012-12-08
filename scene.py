@@ -30,6 +30,18 @@ class Scene:
     def add_group(self,group):
         for item,layer in group.items.iteritems():
             layer.add(item)
+    def remove_duplicates(self):
+        for layer in self.layers:
+            new_items = [layer.items[-1]]
+            for i,item in enumerate(layer.items[:-1]):
+                found = 0
+                for other in layer.items[i+1:]:
+                    if item.key() == other.key():
+                        found = 1
+                if not found:
+                    new_items.append(item)
+            layer.items = new_items
+
 
     def strarray(self):
         var = ["<?xml version=\"1.0\" ?>\n",

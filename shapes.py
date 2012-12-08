@@ -5,73 +5,85 @@ from geom import *
 from math import pi,sin,cos,atan
 from numpy import *
 
-class Line:
+
+class Line():
     def __init__(self,start,end):
+        self.type = 'line'
         self.start = start 
         self.end = end    
         return
+    def key(self):
+        return (self.type, self.start[0], self.start[1], self.end[0], self.end[1])
 
-    def mirror(self,p,v): #mirror about line through point p along vector v
+    def mirror(self,p,v): 
         return Line(mirror_p(self.start,p,v),mirror_p(self.end,p,v))
-    def rotate(self,p,t): #rotate about p by t radians
+    def rotate(self,p,t): 
         return Line(rotate_p(asarray(self.start),p,t),rotate_p(asarray(self.end),p,t))
-    def translate(self,v): #translate along v
+    def translate(self,v): 
         return Line(asarray(self.start)+asarray(v),asarray(self.end)+asarray(v))
 
     def strarray(self,s):
         return ["  <line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" />\n" %\
                 (self.start[0],self.start[1],self.end[0],self.end[1])]
 
-class Circle:
+class Circle():
     def __init__(self,center,radius):
+        self.type = 'circle'
         self.center = center
         self.radius = radius
         return
+    def key(self):
+        return (self.type, self.center[0], self.center[1], self.radius)
 
-    def translate(self,v): #translate along v
+    def translate(self,v): 
         return Circle(asarray(self.center)+asarray(v),self.radius)
-    def rotate(self,p,t): #rotate about p by t radians
+    def rotate(self,p,t): 
         return Circle(rotate_p(asarray(self.center),p,t),self.radius)
-    def mirror(self,p,v): #mirror about line through point p along vector v
+    def mirror(self,p,v): 
         return Circle(mirror_p(self.center,p,v),self.radius)
-
     def strarray(self,s):
         return ["  <circle cx=\"%f\" cy=\"%f\" r=\"%f\"/>\n" %\
                 (self.center[0],self.center[1],self.radius)]
 
-class Ellipse:
+class Ellipse():
     def __init__(self,center,xr,yr,rot):
+        self.type = 'ellipse'
         self.center = center
         self.xr  = xr
         self.yr = yr
         self.rot = rot
         return
+    def key(self):
+        return (self.type, self.center[0], self.center[1], self.xr, self.yr, self.rot)
 
-    def translate(self,v): #translate along v
+    def translate(self,v):
         return Ellipse(asarray(self.center)+asarray(v),self.xr,self.yr,self.rot)
-    def rotate(self,p,t): #rotate about p by t radians
+    def rotate(self,p,t): 
         return Ellipse(rotate_p(asarray(self.center),p,t),self.xr,self.yr,self.rot+t)
-    def mirror(self,p,v): #mirror about line through point p along vector v
+    def mirror(self,p,v):
         return Ellipse(mirror_p(self.center,p,v),self.xr,self.yr, pi - self.rot)
 
     def strarray(self,s):
         return ["  <ellipse transform=\"rotate(-%f)\" cx=\"%f\" cy=\"%f\" rx=\"%f\" ry=\"%f\"/>\n" %\
                 (self.rot,self.center[0],self.center[1],self.xr,self.yr)]
 
-class Arc:
+class Arc():
     #draws an arc with center, radius, ccw from th1 to th2
     #right now, angles must be in [-pi,pi)
     def __init__(self,center,radius,th1,th2):
+        self.type = 'arc'
         self.center = center
         self.radius = radius
         self.th1 = th1
         self.th2 = th2
+    def key(self):
+        return (self.type, self.center[0], self.center[1], self.radius, self.th1, self.th2)
 
-    def translate(self,v): #translate along v
+    def translate(self,v): 
         return Arc(asarray(self.center)+asarray(v),self.radius,self.th1,self.th2)
-    def rotate(self,p,t): #rotate about p by t radians
+    def rotate(self,p,t): 
         return Arc(rotate_p(asarray(self.center),p,t),self.radius,self.th1+t,self.th2+t)
-    def mirror(self,p,v): #mirror about line through point p along vector v
+    def mirror(self,p,v): 
         vth = angle_between([1,0],v)
         return Arc(mirror_p(self.center,p,v),self.radius,2*vth-self.th2,2*vth-self.th1)
 
@@ -102,8 +114,8 @@ class Arc:
                     large_arc_flag, sweep_flag,\
                     end[0],end[1])]
 
-#test routine
-def test():
+#test
+if __name__ == '__main__': 
     scene = Scene('origami-test',8.5,8.5,'in')
     mtn = Layer('mountain',(0,0,255),scene)
     val = Layer('valley',(255,0,0),scene)
@@ -113,10 +125,7 @@ def test():
     t = 2*pi*arange(6)/6.
     g = g.translate(2*sqrt(2)*dstack((cos(t),sin(t)))[0])
     scene.add_group(g)
+    scene.remove_duplicates()
     scene.write_svg()
     scene.display()
-    return
-
-if __name__ == '__main__': test()
-
 
