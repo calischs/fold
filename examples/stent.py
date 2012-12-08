@@ -6,17 +6,10 @@ from shapes import *
 #should spike.  In order to eliminate out-of-plane behavior, the parameter t should
 #be less than material thickness, say half.
 
-
 m = 10 #number of rows thetally
-#n = 16 #number of rows axially, should be even.
-n=m+2
-
+n=m+2 #number of rows axially, should be even.
 l = .75 #base length
-
-print 'Dimensions: %.2f x %.2f' % (l*n, l*m)
-
 scene = Scene('stent',n*l+1,m*l+1,'in',.01)
-
 mountain = Layer('mountain',(0,0,255),scene)
 cut = Layer('cut',(255,0,255),scene)
 valley = Layer('valley',(0,255,0),scene)
@@ -26,15 +19,17 @@ lin1 = Line([0,0],[.5*l,0])
 lin2 = Line([0,.5*l],[.5*l,0])
 lin3 = Line([0,0],[0,.5*l])
 lin4 = Line([0,.5*l],[.5*l,.5*l])
-g = Group({lin1:mountain,lin2:valley,lin2.mirror([0,.5*l],[1,0]):valley,lin3:mountain,lin4:mountain})
+g = Group({lin1:mountain,lin2:valley,lin3:mountain,lin4:mountain})
+
 g = g.mirror([.5*l,0],[0,1],copy=True)
-
 g = g.translate(array([[0,0],[l,.5*l]]))
-#g = g.mirror([0,.5*l],[1,0],copy=True)
+g = g.mirror([0,.5*l],[1,0],copy=True)
 
-t = 2*l*(arange(n/2)-n/4.).reshape(1,-1,1) * array([[1,0]]) + l*(arange(m)-m/2).reshape(-1,1,1) * array([[0,1]])
-t = t.reshape(-1,2)
+na = 2*l*(arange(n/2)-n/4.).reshape(-1,1) * array([1,0])
+ma = l*(arange(m)-m/2).reshape(-1,1,1) * array([0,1])
+t = (na+ma).reshape(-1,2)
 g = g.translate( t)
+
 scene.add_group(g)
 
 pts = [[-.5*n*l,-.5*m*l],
@@ -53,10 +48,9 @@ hole = hole.translate( l*(arange(n)-n/2+.5).reshape(-1,1)*array([[1,0]]) )
 hole = hole.translate((.5*l*m-.05)*array([[0,1],[0,-1]]))
 scene.add_group(hole)
 
+scene.remove_duplicates()
 scene.write_svg()
 scene.display()
-
-
 
 #make cut files
 cut1 = Scene.from_scene(scene,'stent-cut1')
