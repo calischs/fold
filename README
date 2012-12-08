@@ -1,12 +1,12 @@
-TODO: write this out.
+Fold
+Lightweight python for scripting SVG, used for origami
 
-for now, try to think through dependencies:
+Tentative deps:
 -python, pref 2.7
 -numpy
--pstoedit
--inkscape
--ImageMagick
-
+-pstoedit (only for dxf conversion)
+-inkscape (only for ps conversion)
+-ImageMagick (used for viewing, can be replaced with display command)
 
 Steps:
 1. Macports
