@@ -1,0 +1,37 @@
+<html>
+<head>
+<link href="css/site.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div>
+<p class="title"> <a href='http://courses.csail.mit.edu/6.849/fall12/'>6.849: geometric folding algorithms</a> </p>
+<p align="right" class="name"> <a href='http://www.mit.edu/~calisch'>sam calisch</a><br/>
+  <a href="index.html" class="link">main</a><br /></p>
+<div style="clear:both;"></div>
+
+<div class='content_heading'>Laser Welding + Films</div>
+<div align='center'><img src="media/welding/wrinkle.jpg" height="450" /></div><br>
+
+<p>Normally laser cutters are precisely focused to maximize power density at the cut.  If, however, we intentionally defocus the laser, we can distribute power over a wider area.  Coupled with gas assist at the nozzle, this can effectively weld thin films in complex patterns.  This process is fertile testing for the problems we posed in class surrounding inflation.  For instance, the picture below shows a complex pattern in laser-welded 8 mil polyurethane film.</p><br>
+
+<div align='center'><img src="media/welding/starfish.jpg" height="450" /></div><br>
+
+<p>Using this process, I wanted to build an illustration of the <a href='http://en.wikipedia.org/wiki/Paper_bag_problem'>tea bag problem</a>, where two squares are joined along their boundary.  When inflated, these squares assume a wrinkly shape, the volume of which is currently unknown!  I used 5 mil PET film because it resists stretch -- a fundamental part of the tea bag problem.  Unfortunately, inextensible plastics tend to be somewhat brittle and are more difficult to weld than stretchy materials like polyurethane.</p><br>
+
+<p>To find the most appropriate setting for the laser cutter, I made several small tests.  To evaluate them, I burst tested them with a water-filled syringe.  Using a 5 inch focal length lens, I backed 1.25 inches off of the focal point to form a nice welding bead.</p><br>
+
+<div align='center'><img src="media/welding/test.jpg" height="450" /></div><br>
+
+<p>After the tests, I used the same settings to create a doubly-covered square, one meter on a side.  In order to keep the bead consistent at the corners, it's necessary to put a small fillet in.  If the toolpathing software sees a right angle, it will decellerate into the corner.  For a process like this where we need extremely consistent power density, a fillet keeps the laser moving at more-or-less the same speed through the corner.  I used 1/8" radius for the fillet -- the smallest value I felt comfortable using.  The picture below shows tea bag ready for inflation.</p><br>
+<div align='center'><img src="media/welding/flat.jpg" height="450" /></div><br>
+
+<p>I used a self-adhesive kite valve to inflate the tea bag.  As always, there are some slow leaks, but a breath through the one-way valve every few minutes keeps it taut.</p><br>
+<div align='center'><img src="media/welding/inflated.jpg" height="450" /></div><br>
+
+
+
+<div align="center"><span class="footnote"><br />
+  6.849 2012  </span>  </div>
+</div>
+</body>
+</html>
