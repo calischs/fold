@@ -29,24 +29,23 @@ g = g.translate((tn+tm).reshape(-1,2))
 
 scene.add_group(g)
 
-#pts = [[-.5*n*l,-.5*m*l],
-#		[.5*n*l,-.5*m*l],
-#		[.5*n*l,.5*m*l],
-#		[-.5*n*l,.5*m*l]]
-#outline = Group({Line(pts[i],pts[(i+1)%len(pts)]):cut for i in range(len(pts))})
-#scene.add_group(outline)
+pts = [[(-1.5*m-.25)*l,.5*sqrt(3)*(n+.5)*l],
+		[(1.5*m-.25)*l,.5*sqrt(3)*(n+.5)*l],
+		[(1.5*m-.25)*l,-.5*sqrt(3)*(n+.5)*l],
+		[(-1.5*m-.25)*l,-.5*sqrt(3)*(n+.5)*l]]
+outline = Group({Line(pts[i],pts[(i+1)%len(pts)]):cut for i in range(len(pts))})
+scene.add_group(outline)
 
-#scene.remove_duplicates()
+scene.remove_duplicates()
 scene.write_svg()
 scene.display()
 
 #make cut files
-#cut1 = Scene.from_scene(scene,'stent-cut1')
-#cut1.add_layers([mountain,cut,holes])
-#cut1.write_svg()
+cut1 = Scene.from_scene(scene,'resch-cut1')
+cut1.add_layers([mountain,cut])
+cut1.write_svg()
 
-#cut2 = Scene.from_scene(scene,'stent-cut2')
-#valley.mirror([0,0],[1,0]) #mirror about horizontal for material flip
-#holes.mirror([0,0],[1,0])
-#cut2.add_layers([valley,holes]) 
-#cut2.write_svg()
+cut2 = Scene.from_scene(scene,'resch-cut2')
+valley.mirror([0,0],[1,0]) #mirror about horizontal for material flip
+cut2.add_layers([valley]) 
+cut2.write_svg()
