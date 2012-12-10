@@ -3,9 +3,9 @@ from shapes import *
 
 #Ron Resch tesselation
 
-l = .25 #triangle circumradius
-n = 8 #twice number in height
-m = 8 #twice number in width
+l = .5 #triangle circumradius
+n = 6 #twice number in height
+m = 6 #twice number in width
 
 scene = Scene('resch',3*(m+.5)*l,sqrt(3)*(n+1)*l,'in',.01)
 mountain = Layer('mountain',(0,0,255),scene)
