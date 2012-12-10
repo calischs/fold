@@ -9,9 +9,75 @@
   <a href="index.html" class="link">main</a><br /></p>
 <div style="clear:both;"></div>
 
+<div align='center'><img src='media/micro/resch-mask.png' height="500"></div><br>
 <div class='content_heading'>Scripting SVG with Python</div>
-<p>stuff. <a href='https://github.com/calischs/fold'>Github</a></p><br>
 
+<p>My research group, the <a href='http://cba.mit.edu/'>Center for Bits and Atoms</a>, spends a fair bit of research time rethinking the computer aided design process.  One of the products of this is the <a href='http://kokompe.cba.mit.edu/'>fab modules</a>, a set of software tools, scripts, and machine drivers bundled under a common GUI.  The major included design tool, Kokopelli, is based on volume representations of objects.  While this greatly simplifies the design of many things, it is not ideal for creating crease patterns.  For designing inherently one-dimensional objects, we need another entry point to the fab modules.</p><br>
+
+<p>To this end, I wrote some lightweight python classes to script the generation of SVG files.  The snippet below shows the setup for one of Ron Resch's patterns in this framework.  First we import the shape library and set some global values for the pattern.  Then we create a <code class='inline'
+>Scene</code> object with a <code class='inline'>Layer</code> for mountain folds, valley folds, and cuts.</p><br>
+
+<pre><code>
+#!/usr/bin/env python
+from shapes import *
+#Ron Resch tesselation
+
+l = .5 #triangle circumradius
+n = 6 #twice number in height
+m = 6 #twice number in width
+
+scene = Scene('resch',3*(m+.5)*l,sqrt(3)*(n+1)*l,'in',.01)
+mountain = Layer('mountain',(0,0,255),scene)
+cut = Layer('cut',(255,0,255),scene)
+valley = Layer('valley',(0,255,0),scene)
+</code></pre>
+
+<p>Now we can begin to create geometry.  I define three points and create creases between them.  This will be the base of our pattern.</p><br>
+<pre><code>
+p0 = l*array([-1., 0.])
+p1 = l*array([0., sqrt(3)/3.])
+p2 = l*array([-1/2., -sqrt(3)/6.])
+
+lin0 = Line(p0,p1)
+lin1 = Line(p1,p2)
+lin2 = Line(p0,p2)
+
+g = Group({lin0:valley,lin1:mountain,lin2:mountain})
+scene.add_group(g)
+</code></pre>
+
+
+<p>This code generates the output on the left:</p><br>
+
+<div align="center"><table>
+	<tr>
+    	<td><img src="media/script/r1.png" height="300" /><br /></td>
+    	<td><img src="media/script/r2.png" height="300" /><br /></td>
+    </tr>
+</table></div><br>
+
+<div align="center"><table>
+	<tr>
+    	<td><img src="media/script/r3.png" height="300" /><br /></td>
+    	<td><img src="media/script/r4.png" height="300" /><br /></td>
+    </tr>
+</table></div><br>
+
+<p>To create the full pattern, we write geometric transformations of this geometry.  The sequence of snapshots show the output from each subsequent transformation in the snippet:</p>
+<pre><code>
+g = g.rotates([0,0],2*pi*arange(3)/3.)
+g = g.mirror(p0,p1-p0,copy=True)
+g = g.mirror([.5*l,0],[0,1],copy=True)
+tn = sqrt(3)*l*(arange(n)-n/2+.25).reshape(1,-1,1)*array([[0,1]])
+tm = 3*l*(arange(m)-m/2+.25).reshape(-1,1,1)*array([[1,0]])
+g = g.translate((tn+tm).reshape(-1,2))
+</code></pre>
+<div align='center'><img src='media/script/r5.png' height="450"></div><br>
+
+
+<p>It's easy to define additional functions and classes on top of this basic framework.  The image at the top shows a mask derived from this crease pattern used in my <a href='microspheres.html'>Expancel experiments</a>.  The python source, this Resch script, as well as several other example scripts are available at the project page on <a href='https://github.com/calischs/fold'>Github</a>.  Below is the output for some other examples:</p><br>
+<div align='center'><img src='media/script/stent.png' width="700"></div><br>
+<div align='center'><img src='media/script/huffman.png' width="700"></div><br>
 
 <div align="center"><span class="footnote"><br />
   6.849 2012  </span>  </div>
