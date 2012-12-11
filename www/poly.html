@@ -12,10 +12,9 @@
 <div align='center'><img src="media/wave.jpg" height="500" /></div><br>
 <div class='content_heading'>Polypropelyne + Vinyl Cutter</div>
 
+<p>During this project, scoring polypropelyne on the vinyl cutter quickly became one of my favorite processes.  Essentially, the vinyl cutter is a computer-controlled knife, with variable speed and pressure.  Polypropelyne is the material commonly used to make <a href='http://en.wikipedia.org/wiki/Living_hinge'>living hinges</a>, monolithic hinge mechanisms make from fatigue resistant materials.  The example you may be most familiar with is the top of a Tic-Tac box.  I used <a href='http://www.mcmaster.com/#standard-polypropylene-sheets/=kjgrgt'>.017" polypropelyne sheets</a> from McMaster-Carr, but academic folders are commonly made from polypropelyne as well.</p><br>
 
-<p>include cut files.  explain process.  include better stent photo.</p><br>
-
-
+<p>By scoring, or cutting partially through, the polypropelyne, we can tell the material where we would like it to fold.  This makes the precreasing process quick and easy.  The only catch is that mountain-valley patterns require scoring on both sides.  The pictures below detail this slightly tricky process:</p><br>
 <div align="center"><table>
 	<tr>
     	<td><img src="media/poly/flip-1.jpg" height="200" /><br /></td>
@@ -24,10 +23,27 @@
     </tr>
 </table></div><br>
 
+<p>First, we score one set of folds, say mountains, as well as an outline of the crease pattern.  Leaving the stock in the machine, we cut along the outline and remove the crease pattern.  Under the hole that is left we apply masking tape, and then we flip the crease pattern and stick it to the tape.  Now we can score the valley folds.  It is important to remember the axis of reflection when we flip the piece and flip the corresponding geometry before scoring.  In the stent example code, the SVG output automatically flips the second cut file about the horizontal.</p>
+<pre><code>
+#make cut files
+cut1 = Scene.from_scene(scene,'stent-cut1')
+cut1.add_layers([mountain,cut])
+cut1.write_svg()
+
+cut2 = Scene.from_scene(scene,'stent-cut2')
+valley.mirror([0,0],[1,0]) #mirror about horizontal for material flip
+holes.mirror([0,0],[1,0])
+cut2.add_layers([valley]) 
+cut2.write_svg()
+</code></pre><br>
+
 <div align='center'><img src="media/poly/creasing.jpg" height="450" /></div><br>
+
+<p>If everything worked out, the precreasing should be a quick process.  For complex patterns like this stent, working in the final shape can still be time consuming but, in the end, rewarding.</p><br>
 
 <div align='center'><a href='http://flic.kr/p/dzG2uZ'><img src='http://farm9.staticflickr.com/8070/8257535109_784a107d51_c.jpg' height="450"></a></div><br>
 
+<p>Curved creases are no problem for the vinyl cutter.  Below is a clone of Huffman's Tower that I made:</p><br>
 <div align='center'><img src='http://farm9.staticflickr.com/8043/8135529983_64580311aa_c.jpg' height="450"></div><br>
 
 <div align="center"><span class="footnote"><br />

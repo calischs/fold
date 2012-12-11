@@ -75,7 +75,26 @@ g = g.translate((tn+tm).reshape(-1,2))
 <div align='center'><img src='media/script/r5.png' height="450"></div><br>
 
 
-<p>It's easy to define additional functions and classes on top of this basic framework.  The image at the top shows a mask derived from this crease pattern used in my <a href='microspheres.html'>Expancel experiments</a>.  The python source, this Resch script, as well as several other example scripts are available at the project page on <a href='https://github.com/calischs/fold'>Github</a>.  Below is the output for some other examples:</p><br>
+<p>It's easy to define additional functions and classes on top of this basic framework.  The image at the top shows a mask derived from this crease pattern used in my <a href='microspheres.html'>Expancel experiments</a>.  The snippet below shows a second constructor for an Arc object using three points, based on a post by Joseph O'Rourke:</p>
+<pre><code>
+  @classmethod
+  def from_3_points(cls,a,b,c):
+    #adapted from Joseph O'Rourke, http://www.ics.uci.edu/~eppstein/junkyard/circumcenter.html
+    def thing0(aa,bb,cc):
+      return (aa[0]**2 + aa[1]**2)*(bb[1]-cc[1])
+    def thing1(aa,bb,cc):
+      return (aa[0]**2 + aa[1]**2)*(cc[0]-bb[0])
+    D = 2*(cross(a,b) + cross(b,c) + cross(c,a))
+    cen0 =(thing0(a,b,c) + thing0(b,c,a) + thing0(c,a,b))/D
+    cen1 =(thing1(a,b,c) + thing1(b,c,a) + thing1(c,a,b))/D
+    R = sqrt((a[0] - cen0)**2 + (a[1] - cen1)**2)
+    center = array([cen0,cen1])
+    th1 = angle_between(asarray([1,0])-center,asarray(a)-center)
+    th2 = angle_between(asarray([1,0])-center,asarray(c)-center)
+    return cls([cen0,cen1],R,th1,th2)
+</code></pre>
+
+<p>The python source, this Resch script, as well as several other example scripts are available at the project page on <a href='https://github.com/calischs/fold'>Github</a>.  Below is the output for some other examples:</p><br>
 <div align='center'><img src='media/script/stent.png' width="700"></div><br>
 <div align='center'><img src='media/script/huffman.png' width="700"></div><br>
 
