@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<svg xmlns="http://www.w3.org/2000/svg"
+  height="24.000000in" width="36.000000in" 
+  units="in"
+  viewBox="0 0 36.000000 24.000000">
+ <g fill="none" stroke-width="0.010000"
+    transform="translate(18.000000,12.000000) scale(1, -1)">
+<g stroke="#f0f">
+  <ellipse transform="rotate(-0.000000)" cx="0.000000" cy="0.000000" rx="18.000000" ry="12.000000"/>
+ </g>
+ </g>
+</svg>

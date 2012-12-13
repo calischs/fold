@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 from shapes import *
-
 #Ron Resch tesselation
 
 l = .5 #triangle circumradius

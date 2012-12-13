@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from shapes import *
 
-scene = Scene('huffman-tower',8.,8.,'in')
+scene = Scene('huffman-tower',7.,3.,'in')
 mtn = Layer('mountain',(0,0,255),scene)
 val = Layer('valley',(255,0,0),scene)
 cut = Layer('cut',(255,0,255),scene)
@@ -28,6 +28,7 @@ outline = [Line([-n*l/2,1.5*h],[n*l/2,1.5*h]),\
 		Line([n*l/2,-1.5*h],[-n*l/2,-1.5*h]),\
 		Line([-n*l/2,-1.5*h],[-n*l/2,1.5*h])]
 cut.add(outline)
+scene.remove_duplicates()
 scene.write_svg()
 scene.display()
 #scene.convert('.dxf')

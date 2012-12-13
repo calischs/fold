@@ -11,21 +11,29 @@
 
 <div align='center'><img src="media/sewing.jpg" height="500" /></div><br>
 <div class='content_heading'>Laser + Sewing</div>
-<p>I love combining laser cutting fabric and sewing -- it's a fast way to make professional looking garments and bags.  After covering D-Forms in class, I knew I had to make a reconfigurable backpack from one.  How many times have you tried to put a long, skinny object into your bag, and it won't fit?  With the D-Form backpack, you can carry objects of all aspect ratio!</p><br>
+<p>I love combining laser cutting fabric and sewing -- it's a fast way to make professional looking garments and bags.  After covering D-Forms in class and reading <a href='http://erikdemaine.org/papers/DForms_DCG/paper.pdf'>Erik's paper</a>, I knew I had to make a reconfigurable backpack from one.  How many times have you tried to put a long, skinny object into your bag, and it won't fit?  With the D-Form backpack, you can carry objects of all aspect ratio!</p><br>
 
-<p>The basic idea was to create a zippable D-Form, such that you can start zipping the zippers together at any point.  This would give you a bag in the shape of any of the D-Forms arising from the original shape.</p><br>
+<p>The basic idea was to create a zippable D-Form, such that you can start zipping the zippers together at any point.  This would give you a bag in the shape of any of the D-Forms arising from the original panel.  Below we can see the two elliptical panels in my backpack in the two extreme configurations:</p><br>
 
 <div align='center'><table><tr>
 	<td><img src='http://farm9.staticflickr.com/8485/8257581199_fa23cac8e8_c.jpg' height="350"></div><br></td>
 	<td><img src='http://farm9.staticflickr.com/8358/8258646896_e72e41a7e4_c.jpg' height="350"></div><br></td>
-</tr></table></div>
+</tr></table></div><br>
 
-<p>To realize this dream, I laser-cut two ellipses from Nylon and sewed a zipper onto the edges.  Since they don't sell circular zippers (at least that I'm aware), the beginnings and ends are a little bit funny, but with practice this backpack is quickly reconfigurable.</p><br>
+<p>To realize this dream, I laser-cut two ellipses from Nylon and sewed a <a href='http://www.sailrite.com/YKK-Continuous-Vislon-Zipper-Chain-White-5'>zipper</a> onto the edges.  Since they don't sell circular zippers (at least that I'm aware), the beginnings and ends are a little bit funny, but with practice this backpack is quickly reconfigurable.  I used a <a href='http://en.wikipedia.org/wiki/File:French_seam.png'>French seam</a> to keep the fabric tails tidy.  The result is a workable bag, below you can see it carrying two kinds of objects using the appropriate configurations:</p><br>
 
 <div align='center'><table><tr>
 	<td><img src='media/sew/boogie.jpg' height="700"></div><br></td>
 	<td><img src='media/sew/baseball.jpg' height="700"></div><br></td>
 </tr></table></div>
+
+<p>I'd like to revisit this concept soon.  For this version, I used an ellipse just because it was an easy shape to cut.  Writing a simulation of the three-dimensional shapes from zipping a given two-dimensional shape seems straightforward.  I'm sure that a more useful backpack would come from a more carefully chosen panel shape.  Though not as true to the paper, it would also be fun to include stiffening elements to help guide the final shape into more useful forms.    Further, developing better ways to handle the ends of the zippers would be an easy way to create a more functional backpack.  </p><br>
+
+<div class='content_heading'>Files</div>
+<ul>
+<li> <a href='../examples/d-form-backpack.py'>Python script for backpack</a>
+<li> <a href='../examples/d-form-backpack.svg'>SVG for first Resch mask</a>
+</ul>
 
 <div align="center"><span class="footnote"><br />
   6.849 2012  </span>  </div>
