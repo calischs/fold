@@ -34,8 +34,7 @@ cut1.write_svg()
 
 cut2 = Scene.from_scene(scene,'stent-cut2')
 valley.mirror([0,0],[1,0]) #mirror about horizontal for material flip
-holes.mirror([0,0],[1,0])
-cut2.add_layers([valley]) 
+cut2.add_layers([valley])
 cut2.write_svg()
 </code></pre><br>
 
