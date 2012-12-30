@@ -9,18 +9,33 @@ from numpy import *
 class Line():
     def __init__(self,start,end):
         self.type = 'line'
-        self.start = start 
-        self.end = end    
+        self.start = asarray(start) 
+        self.end = asarray(end)    
         return
     def key(self):
         return (self.type, self.start[0], self.start[1], self.end[0], self.end[1])
-
+    def __repr__(self):
+        return 'Line([%f,%f],[%f,%f])'%(self.start[0],self.start[1],self.end[0],self.end[1])
     def mirror(self,p,v): 
         return Line(mirror_p(self.start,p,v),mirror_p(self.end,p,v))
     def rotate(self,p,t): 
         return Line(rotate_p(asarray(self.start),p,t),rotate_p(asarray(self.end),p,t))
     def translate(self,v): 
         return Line(asarray(self.start)+asarray(v),asarray(self.end)+asarray(v))
+
+    def midpoint(self,t=.5):
+        return (1-t)*asarray(self.start) + t*asarray(self.end)
+    def perp_thru(self,p):
+        pp = asarray(p) - self.start
+        v = self.end - self.start
+        pp = dot(pp,v)*v/mag_squared(v)
+        return Line(p,pp+self.start)
+    def perp_to(self,l,t): #perp to self at param t, intersecting another line l
+        v = self.end - self.start
+        n = array([-v[1],v[0]])
+        p0 = self.midpoint(t)
+        p = line_line_intersection(p0,n,l.start,l.end-l.start)
+        return Line(p0,p)
 
     def strarray(self,s):
         return ["  <line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" />\n" %\
@@ -34,7 +49,8 @@ class Circle():
         return
     def key(self):
         return (self.type, self.center[0], self.center[1], self.radius)
-
+    def __repr__(self):
+        return 'Circle([%f,%f],%f)'%(self.center[0],self.center[1],self.radius)
     def translate(self,v): 
         return Circle(asarray(self.center)+asarray(v),self.radius)
     def rotate(self,p,t): 
@@ -55,7 +71,8 @@ class Ellipse():
         return
     def key(self):
         return (self.type, self.center[0], self.center[1], self.xr, self.yr, self.rot)
-
+    def __repr__(self):
+        return 'Ellipse([%f,%f],%f,%f,%f)'%(self.center[0],self.center[1],self.xr,self.yr,self.rot)
     def translate(self,v):
         return Ellipse(asarray(self.center)+asarray(v),self.xr,self.yr,self.rot)
     def rotate(self,p,t): 
@@ -78,7 +95,8 @@ class Arc():
         self.th2 = th2
     def key(self):
         return (self.type, self.center[0], self.center[1], self.radius, self.th1, self.th2)
-
+    def __repr__(self):
+        return 'Arc([%f,%f],%f,%f,%f)'%(self.center[0],self.center[1],self.radius,self.th1,self.th2)
     def translate(self,v): 
         return Arc(asarray(self.center)+asarray(v),self.radius,self.th1,self.th2)
     def rotate(self,p,t): 
@@ -102,6 +120,25 @@ class Arc():
         th1 = angle_between(asarray([1,0])-center,asarray(a)-center)
         th2 = angle_between(asarray([1,0])-center,asarray(c)-center)
         return cls([cen0,cen1],R,th1,th2)
+
+    @classmethod
+    #constructor from start point, end point, and radius.
+    def from_2_points_R(cls,a,b,R):
+        a = asarray(a)
+        b = asarray(b)
+        v = b-a
+        n = array([-v[1],v[0]])
+        l = R**2 - .25*mag(v)**2
+        if l<0: #check if radius to small
+            raise(GeometryError())
+        l = sqrt(l)
+        n *= l/mag(n)
+        c = a+.5*v + n
+        aa = a-c
+        bb = b-c
+        th1 = atan2(aa[1],aa[0])
+        th2 = atan2(bb[1],bb[0])
+        return cls(c,R,th1,th2)
 
     def strarray(self,s):
         start = [self.center[0]+self.radius*cos(self.th1), self.center[1]+self.radius*sin(self.th1)]

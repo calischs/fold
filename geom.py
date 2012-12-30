@@ -11,6 +11,8 @@ def angle_between(a,b):
     return atan2(cross(a,b),dot(a,b))
 def mag(v):
     return sqrt(dot(v,v))
+def mag_squared(v):
+    return dot(v,v)
 def mirror_p(a,p,v): #mirror point a about a line through point p along vector v
     a = asarray(a)
     p = asarray(p)
@@ -32,3 +34,11 @@ def line_line_intersection(p0,v0,p1,v1):
     else:
         t = (p1[0]-p0[0] + v1[0]/v1[1]*(p0[1]-p1[1]))/(v0[0]-v0[1]*v1[0]/v1[1])
         return p0+t*v0
+
+class GeometryError(Exception):
+    """Exception raised for illegal geometry construction -- mostly test at this point
+    """
+    def __init__(self):
+        pass
+
+
