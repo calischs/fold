@@ -34,6 +34,25 @@ def line_line_intersection(p0,v0,p1,v1):
     else:
         t = (p1[0]-p0[0] + v1[0]/v1[1]*(p0[1]-p1[1]))/(v0[0]-v0[1]*v1[0]/v1[1])
         return p0+t*v0
+#compute line p->v intersection with circle of radius r centered at c
+def line_circle_intersection(p,v,c,r):
+    p = asarray(p)
+    v = asarray(v)
+    c = asarray(c)
+    f = p-c
+    a = mag_squared(v)
+    b = 2*dot(f,v)
+    c = mag_squared(f) - r*r
+    discrim = b*b - 4*a*c
+    if discrim<0:
+        return None
+    else:
+        discrim = sqrt(discrim)
+        #return min ray distance answer
+        t = [(-b + discrim)/(2*a),(-b - discrim)/(2*a)]
+        t = min(t)
+        return p+t*v
+
 
 class GeometryError(Exception):
     """Exception raised for illegal geometry construction -- mostly test at this point

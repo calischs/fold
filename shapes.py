@@ -25,6 +25,8 @@ class Line():
 
     def midpoint(self,t=.5):
         return (1-t)*asarray(self.start) + t*asarray(self.end)
+    def length(self):
+        return mag(self.end-self.start)
     def perp_thru(self,p):
         pp = asarray(p) - self.start
         v = self.end - self.start
@@ -60,6 +62,8 @@ class Circle():
     def strarray(self,s):
         return ["  <circle cx=\"%f\" cy=\"%f\" r=\"%f\"/>\n" %\
                 (self.center[0],self.center[1],self.radius)]
+    def length(self):
+        return 2*pi*self.radius
 
 class Ellipse():
     def __init__(self,center,xr,yr,rot):
@@ -89,7 +93,7 @@ class Arc():
     #right now, angles must be in [-pi,pi)
     def __init__(self,center,radius,th1,th2):
         self.type = 'arc'
-        self.center = center
+        self.center = asarray(center)
         self.radius = radius
         self.th1 = th1
         self.th2 = th2
@@ -104,6 +108,18 @@ class Arc():
     def mirror(self,p,v): 
         vth = angle_between([1,0],v)
         return Arc(mirror_p(self.center,p,v),self.radius,2*vth-self.th2,2*vth-self.th1)
+    def midpoint(self,t=.5):
+        t = (1-t)*asarray(self.th1) + t*asarray(self.th2)
+        return self.center + self.radius*array([cos(t),sin(t)])
+    def length(self):
+        return self.radius*(self.th2-self.th1)
+
+    #reflect a point p about the arc at point b.
+    def invert(self,p,b):
+        b = asarray(b)
+        r = b-self.center
+        t = array([-r[1],r[0]])
+        return mirror_p(p,b,t)
 
     @classmethod
     def from_3_points(cls,a,b,c): #in ccw order
