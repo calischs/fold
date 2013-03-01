@@ -24,6 +24,9 @@ def rotate_p(a,p,t):
     a = [a[0]*cos(t)-a[1]*sin(t), a[0]*sin(t)+a[1]*cos(t)]
     return a+p
 
+def close(p1,p2,tol):
+    return (abs(p1-p2)<tol).all()
+
 #compute line-line intersection
 def line_line_intersection(p0,v0,p1,v1):
     if v0[1] - v0[0]*v1[1]/v1[0] == 0:

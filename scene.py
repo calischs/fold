@@ -41,6 +41,25 @@ class Scene:
                 if not found:
                     new_items.append(item)
             layer.items = new_items
+    def merge_entities(self,tol=.001):
+        #joining up consecutive elements
+        #not fully implemented yet, for now, just lines to lines.
+        #TODO: elements to path, use path structure to do more merging with less overhead
+        print 'merging entities'
+        print "layer: original, final"
+        for layer in self.layers:
+            new_items = []
+            for item in layer.items:
+                new_items.append(item)
+                for i,l1 in enumerate(new_items[:-1]):
+                    if l1.type == 'line':
+                        for l2 in new_items[i+1:]:
+                            if l2.type == 'line':
+                                merged = l1.merge(l2)
+                                if merged:
+                                    new_items.remove(l2)
+            print '%s: %d, %d'%(layer.name, len(layer.items), len(new_items))
+            layer.items = new_items
 
 
     def strarray(self):
@@ -163,3 +182,9 @@ class Group:
             for item,layer in self.items.iteritems():
                 new[item.translate(t)] = layer
         return Group(new)
+
+class NotImplementedError(Exception):
+    """Exception raised for functions not yet implemented
+    """
+    def __init__(self):
+        pass

@@ -39,9 +39,128 @@ class Line():
         p = line_line_intersection(p0,n,l.start,l.end-l.start)
         return Line(p0,p)
 
+    def slope(self):
+        v = self.end - self.start
+        if v[0]==0 and v[1] == 0:
+            return float('nan')
+        elif v[0]==0 and v[1] != 0:
+            return float('inf')
+        else:
+            return v[1]/v[0]
+    def merge(self,other,tol=.001):
+        #attempt to merge another line into self.  
+        #on success return true, on fail return false
+        #TODO: test for partial overlap
+        #TODO: make tol commesurate
+        parallel = abs(self.slope() - other.slope())<tol
+        if parallel:
+            if close(self.start, other.start, tol) and close(self.end, other.end, tol):
+                return True
+            elif close(self.end, other.start, tol):
+                self.end = other.end
+                return True
+            elif close(other.end, self.start, tol): 
+                self.start = other.start
+                return True
+            else:
+                return False
+        else:
+            return False
+
     def strarray(self,s):
         return ["  <line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" />\n" %\
                 (self.start[0],self.start[1],self.end[0],self.end[1])]
+
+class CubicBezier():
+    def __init__(self,p0,p1,p2,p3):
+        self.type = 'spline'
+        self.p0 = asarray(p0)
+        self.p1 = asarray(p1)
+        self.p2 = asarray(p2)
+        self.p3 = asarray(p3)
+        return
+    def key(self):
+        return (self.type,self.p0[0],self.p0[1],self.p1[0],self.p1[1],self.p2[0],self.p2[1],self.p3[0],self.p3[1])
+    def __repr__(self):
+        return 'CubicBezier['+','.join(['[%f,%f]'%tuple(p) for p in [self.p0,self.p1,self.p2,self.p3]]) + ']'
+    def mirror(self,p,v): 
+        p0 = mirror_p(self.p0,p,v)
+        p1 = mirror_p(self.p1,p,v)
+        p2 = mirror_p(self.p2,p,v)
+        p3 = mirror_p(self.p3,p,v)
+        return CubicBezier(p0,p1,p2,p3)
+    def rotate(self,p,t): 
+        p0 = rotate_p(self.p0,p,t)
+        p1 = rotate_p(self.p1,p,t)
+        p2 = rotate_p(self.p2,p,t)
+        p3 = rotate_p(self.p3,p,t)
+        return CubicBezier(p0,p1,p2,p3)
+    def translate(self,v): 
+        v = asarray(v)
+        return CubicBezier(self.p0+v,self.p1+v,self.p2+v,self.p3+v)
+    def midpoint(self,t=.5):
+        raise NotImplementedError
+    def length(self):
+        raise NotImplementedError
+    def strarray(self,s):
+        return ["  <path d=\"M%f,%f C%f,%f, %f,%f, %f,%f\" />\n" %\
+                (self.p0[0],self.p0[1],self.p1[0],self.p1[1],self.p2[0],self.p2[1],self.p3[0],self.p3[1])]
+
+class Polyline():
+    def __init__(self,points,closed=False):
+        self.type = 'polyline'
+        self.points = asarray(points)
+        self.closed = closed
+        return
+    def key(self):
+        return (self.type).extend(tuple(list(ravel(points))))
+    def __repr__(self):
+        return 'Polyline['+','.join(['[%f,%f]'%tuple(p) for p in self.points]) + ']'
+    def mirror(self,p,v): 
+        new_points = []
+        for pp in self.points:
+            new_points.append(mirror_p(pp,p,v))
+        return Polyline(new_points,self.closed)
+    def rotate(self,p,t): 
+        new_points = []
+        for pp in self.points:
+            new_points.append(rotate_p(pp,p,v))
+        return Polyline(new_points,self.closed)
+    def translate(self,v): 
+        v = asarray(v)
+        return Polyline(v+points,self.closed)
+
+    def length(self):
+        l = 0
+        for i in range(len(self.points)-1):
+            l += mag(self.points[i+1]-self.points[i])
+        if self.closed:
+            l += mag(self.points[-1]-self.points[0])
+        return l  
+    def point(self,t=0):
+        assert(0<=t<=1)
+        if t==0:
+            return self.points[0]
+        elif t==1:
+            return self.points[-1]
+        else:
+            t *= self.length()
+            n = len(self.points)
+            cum = 0
+            for i in range(n if self.closed else n-1):
+                li = mag(self.points[(i+1)%n]-self.points[i])
+                if cum+li>t:
+                    a = (t-cum)/li
+                    return (1-a)*self.points[i]+a*self.points[(i+1)%n]
+                else:
+                    cum += li
+    def strarray(self,s):
+        return ["  <path d=\"M%f,%f"%tuple(self.points[0]) + \
+                    ''.join([" L%f,%f"%tuple(p) for p in self.points[1:-1]]) +\
+                    " L%f,%f"%tuple(self.points[-1]) + \
+                    "%s\" />\n"%('Z' if self.closed else '')
+                ]
+
 
 class Circle():
     def __init__(self,center,radius):
