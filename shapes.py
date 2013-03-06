@@ -160,7 +160,7 @@ class Polyline():
         t *= self.length()
         n = len(self.points)
         cum = 0
-        for i in range(n if self.close else n-1):
+        for i in range(n if self.closed else n-1):
             li = mag(self.points[(i+1)%n]-self.points[i])
             if cum+li>=t:
                 return i
@@ -169,6 +169,10 @@ class Polyline():
 
     def sub(self,start,end):
         #return a sub-polyline between parameters start and end
+        if end<start:
+            tmp = end
+            end = start
+            start = tmp
         assert(0<=start<end<=1)
         p_start = self.point(start)
         i_start = self.segment(start)
@@ -181,7 +185,6 @@ class Polyline():
         #return a list of unit normal vectors at the vertices.  
         norms = []
         angle = -pi/2 if side=='left' else pi/2
-        print angle
         n = len(self.points)
         for i in range(n):
             if i==0 and not self.closed:
@@ -200,6 +203,19 @@ class Polyline():
         ns = self.normals(side)
         new_points = [p+d*n for p,n in zip(self.points,ns)]
         return Polyline(new_points,self.closed)
+
+    def offset_p(self,t,d,side='left'):
+        #offset a point parameterized by t a distance d
+        si = self.segment(t)
+        n = len(self.points)
+        angle = -pi/2 if side=='left' else pi/2
+        #not handling open pl
+        norm = self.points[(si+1)%n] - self.points[si]
+        norm = rotate_p(norm,[0,0],angle)
+        norm /= mag(norm)
+        return self.point(t) + d*norm
+#    def offset_sub(self,start,end,d,side='left'):
+
 
     def strarray(self,s):
         return ["  <path d=\"M%f,%f"%tuple(self.points[0]) + \
