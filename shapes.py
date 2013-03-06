@@ -173,7 +173,9 @@ class Polyline():
             tmp = end
             end = start
             start = tmp
-        assert(0<=start<end<=1)
+        if not 0<=start<=end<=1:
+            print 'start=',start, 'end=',end
+            assert(False)
         p_start = self.point(start)
         i_start = self.segment(start)
         p_end = self.point(end)
