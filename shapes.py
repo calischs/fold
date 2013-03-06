@@ -154,6 +154,53 @@ class Polyline():
                     return (1-a)*self.points[i]+a*self.points[(i+1)%n]
                 else:
                     cum += li
+    def segment(self,t):
+        #return the index of line segment in which t lies
+        assert(0<=t<=1)
+        t *= self.length()
+        n = len(self.points)
+        cum = 0
+        for i in range(n if self.close else n-1):
+            li = mag(self.points[(i+1)%n]-self.points[i])
+            if cum+li>=t:
+                return i
+            else:
+                cum += li
+
+    def sub(self,start,end):
+        #return a sub-polyline between parameters start and end
+        assert(0<=start<end<=1)
+        p_start = self.point(start)
+        i_start = self.segment(start)
+        p_end = self.point(end)
+        i_end = self.segment(end)
+        new_points = vstack(([p_start],self.points[i_start+1 : i_end],[p_end]))
+        return Polyline(new_points,False)
+
+    def normals(self,side='left'):
+        #return a list of unit normal vectors at the vertices.  
+        norms = []
+        angle = -pi/2 if side=='left' else pi/2
+        print angle
+        n = len(self.points)
+        for i in range(n):
+            if i==0 and not self.closed:
+                p = self.points[(i+1)%n] - self.points[i]
+            elif i==n-1 and not self.closed:
+                p = self.points[i] - self.points[(i+n-1)%n]
+            else: 
+                #central difference when possible   
+                p = self.points[(i+1)%n] - self.points[(i+n-1)%n]
+            p = rotate_p(p,[0,0],angle)
+            p /= mag(p)
+            norms.append(p)
+        return norms
+
+    def offset(self,d,side='left'):
+        ns = self.normals(side)
+        new_points = [p+d*n for p,n in zip(self.points,ns)]
+        return Polyline(new_points,self.closed)
+
     def strarray(self,s):
         return ["  <path d=\"M%f,%f"%tuple(self.points[0]) + \
                     ''.join([" L%f,%f"%tuple(p) for p in self.points[1:-1]]) +\
