@@ -131,6 +131,14 @@ class Layer:
     def translate(self,t):
         for i,item in enumerate(self.items):
             self.items[i] = item.translate(t)
+    def offset(self,d,side='left'):
+        for i,item in enumerate(self.items):
+            t = self.items[i].type
+            if(t!='polyline' and t!='circle' and t!='line'):
+                print t
+                assert(False)
+            self.items[i] = item.offset(d,side)
+
 
 
 #this will allow instancing, transforms, etc. on a group while preserving layers

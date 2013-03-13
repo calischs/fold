@@ -23,7 +23,7 @@ class Line():
     def translate(self,v): 
         return Line(asarray(self.start)+asarray(v),asarray(self.end)+asarray(v))
 
-    def midpoint(self,t=.5):
+    def evaluate(self,t=.5):
         return (1-t)*asarray(self.start) + t*asarray(self.end)
     def length(self):
         return mag(self.end-self.start)
@@ -38,6 +38,13 @@ class Line():
         p0 = self.midpoint(t)
         p = line_line_intersection(p0,n,l.start,l.end-l.start)
         return Line(p0,p)
+
+    def offset(self,d,side='left'):
+        n = self.end - self.start
+        angle = pi/2 if side=='left' else -pi/2
+        n = rotate_p(n,[0,0],angle)
+        n /= mag(n)
+        return Line(self.start+d*n, self.end+d*n)
 
     def slope(self):
         v = self.end - self.start
@@ -98,8 +105,12 @@ class CubicBezier():
     def translate(self,v): 
         v = asarray(v)
         return CubicBezier(self.p0+v,self.p1+v,self.p2+v,self.p3+v)
-    def midpoint(self,t=.5):
-        raise NotImplementedError
+    def evaluate(self,t=.5):
+        return self.p0*(1-t)**3 + self.p1*(3*t*(1-t)**2) + self.p2*(3*(1-t)*t**2) + self.p3*t**3;
+    def to_polyline(self,res=100):
+        t = arange(0,1.,1./res).reshape(-1,1)
+        p = self.evaluate(t)
+        return Polyline(p,False)
     def length(self):
         raise NotImplementedError
     def strarray(self,s):
@@ -128,7 +139,7 @@ class Polyline():
         return Polyline(new_points,self.closed)
     def translate(self,v): 
         v = asarray(v)
-        return Polyline(v+points,self.closed)
+        return Polyline(v+self.points,self.closed)
 
     def length(self):
         l = 0
@@ -137,7 +148,7 @@ class Polyline():
         if self.closed:
             l += mag(self.points[-1]-self.points[0])
         return l  
-    def point(self,t=0):
+    def evaluate(self,t=0):
         assert(0<=t<=1)
         if t==0:
             return self.points[0]
@@ -176,9 +187,9 @@ class Polyline():
         if not 0<=start<=end<=1:
             print 'start=',start, 'end=',end
             assert(False)
-        p_start = self.point(start)
+        p_start = self.evaluate(start)
         i_start = self.segment(start)
-        p_end = self.point(end)
+        p_end = self.evaluate(end)
         i_end = self.segment(end)
         new_points = vstack(([p_start],self.points[i_start+1 : i_end],[p_end]))
         return Polyline(new_points,False)
@@ -215,7 +226,7 @@ class Polyline():
         norm = self.points[(si+1)%n] - self.points[si]
         norm = rotate_p(norm,[0,0],angle)
         norm /= mag(norm)
-        return self.point(t) + d*norm
+        return self.evaluate(t) + d*norm
 #    def offset_sub(self,start,end,d,side='left'):
 
 
@@ -248,6 +259,9 @@ class Circle():
                 (self.center[0],self.center[1],self.radius)]
     def length(self):
         return 2*pi*self.radius
+    def offset(self,d,side='left'):
+        diff = d if side=='right' else -d
+        return Circle(self.center,self.radius + d)
 
 class Ellipse():
     def __init__(self,center,xr,yr,rot):
