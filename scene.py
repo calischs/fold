@@ -3,7 +3,7 @@
 #with influence from http://code.activestate.com/recipes/325823-draw-svg-images-in-python/
 
 import os,sys
-
+from numpy import float64
 def colorstr(rgb): return "#%x%x%x" % (rgb[0]/16,rgb[1]/16,rgb[2]/16)
 
 class Scene:
@@ -30,17 +30,35 @@ class Scene:
     def add_group(self,group):
         for item,layer in group.items.iteritems():
             layer.add(item)
-    def remove_duplicates(self):
+
+    def key_close(self,a,b,tol=.001):
+        close = True
+        for ai,bi in zip(a,b):
+            if type(ai) != type(bi):
+                close=False
+                break
+            elif type(ai)==float64:
+                if abs(ai-bi)>tol:
+                    close = False
+                break
+            elif ai!=bi:
+                close=False
+                break
+        return close
+    def remove_duplicates(self,tol=1e-15):
+        num_removed = 0
         for layer in self.layers:
             new_items = [layer.items[-1]]
             for i,item in enumerate(layer.items[:-1]):
                 found = 0
                 for other in layer.items[i+1:]:
-                    if item.key() == other.key():
+                    if self.key_close(item.key, other.key,tol):
                         found = 1
+                        num_removed += 1
                 if not found:
                     new_items.append(item)
             layer.items = new_items
+            print 'removed %d duplicate items'%num_removed
     def merge_entities(self,tol=.001):
         #joining up consecutive elements
         #not fully implemented yet, for now, just lines to lines.
@@ -60,7 +78,7 @@ class Scene:
                                     new_items.remove(l2)
             print '%s: %d, %d'%(layer.name, len(layer.items), len(new_items))
             layer.items = new_items
-
+    #TODO: write a better join function to keep things clean!
 
     def strarray(self):
         var = ["<?xml version=\"1.0\" ?>\n",
@@ -77,6 +95,7 @@ class Scene:
         return var
 
     def write_svg(self,filename=None):
+        print 'Dimensions: %.2f %s x %.2f %s'%(self.width,self.units,self.height,self.units)
         if filename:
             self.svgname = filename
         else:

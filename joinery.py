@@ -4,14 +4,16 @@ from numpy import *
 from geom import *
 from shapes import *
 from scene import *
+from Polyline import *
 
 class Joinery():
-	def __init__(self,l,mat_thick,outer,inner,connect_offset):
+	def __init__(self,l,mat_thick,outer,inner,connect_offset,width):
 		self.l = l
 		self.mat_thick = mat_thick
 		self.outer = outer #cut layer
 		self.inner = inner #internal layer	
 		self.connect_offset = connect_offset
+		self.width = width #max outwards distance from edge of input to edge of joinery
 	def unit(self):
 		#a unit of the joinery in a coordinate system
 		# x->offset, y->along (in units of l)
@@ -24,12 +26,16 @@ class Joinery():
 		g = Group(None)
 		unit = self.unit()
 		if mirror:
-			unit = unit.mirror([0,.5],[1,0])
+			unit = unit.mirror([0,.5],[1.,0])
+
+		#look into possible issue with side -- things not joining
+
 		for j in range(n):
 			t = start + j*ds
 			for item,layer in unit.items.iteritems():
 				assert(item.type == 'polyline') #for now
 				np = len(item.points)
+				new_pl = Polyline([])
 				for i in range(np if item.closed else np-1):
 					p0 = item.points[i]
 					p1 = item.points[(i+1)%np]
@@ -39,15 +45,20 @@ class Joinery():
 						e = t+ds*p1[1]
 						sub_pl = pl.sub(s, e).offset(p0[0],side)
 						#this is sloppy at edges...
-						g.add({sub_pl:layer})
+						#g.add({sub_pl:layer})
+						new_pl.add_points(sub_pl.points)
 					elif d[1]==0:
 						q0 = pl.offset_p( t+ds*p0[1],p0[0],side)
 						q1 = pl.offset_p( t+ds*p1[1],p1[0],side)
-						g.add({Line(q0,q1):layer})
+						#g.add({Line(q0,q1):layer})
+						new_pl.add_points([q0,q1])
 					else:
-						#maybe assume these are small and
-						#just offset the endpoints?
-						raise NotImplementedError
+						#assume these are small, just offset the endpoints?
+						q0 = pl.offset_p( t+ds*p0[1],p0[0],side)
+						q1 = pl.offset_p( t+ds*p1[1],p1[0],side)
+						#g.add({Line(q0,q1):layer})
+						new_pl.add_points([q0,q1])
+				g.add({new_pl:layer})
 		if self.connect_offset:
 			pl_sub = pl.sub(0.,start).offset(self.connect_offset,side)
 			g.add({pl_sub:self.outer})
@@ -55,6 +66,9 @@ class Joinery():
 			pl_sub = pl.sub(t,1.).offset(self.connect_offset,side)
 			g.add({pl_sub:self.outer})
 		return g
+
+	#TODO: add a 'view' function to just see the joinery geometry
+	# in normal space
 
 	def runs(self,pls,sides='left',mirrors=False):
 		g = Group(None)
@@ -72,14 +86,14 @@ class Joinery():
 #Zipper edge-type joinery
 class EdgeZipper(Joinery):
 	def __init__(self,l,mat_thick,outer,inner):
-		Joinery.__init__(self,l,mat_thick,outer,inner,-.5*mat_thick)
+		Joinery.__init__(self,l,mat_thick,outer,inner,-.5*mat_thick,2*mat_thick)
 	def unit(self):
 		m = self.mat_thick
 		pl = Polyline(asarray([	
 			[-.5*m,0],
 			[-.5*m,.1],
-			[1.*m,.1],
-			[1.*m,.4],
+			[1.5*m,.1],
+			[1.5*m,.4],
 			[-.5*m,.4],
 			[-.5*m,.53],
 			[2.*m,.53],
@@ -88,19 +102,60 @@ class EdgeZipper(Joinery):
 			[-.5*m,1.]]),
 			False
 			)
+		os = .2*m
 		pl2 = Polyline(asarray([
-			[-.5*m,.6],
-			[.5*m,.6],
-			[.5*m,.9],
-			[-.5*m,.9]]),
+			[-.5*m-os,.6],
+			[.5*m-os,.6],
+			[.5*m-os,.9],
+			[-.5*m-os,.9]]),
 			closed=True
 			)
 		return Group({pl:self.outer,pl2:self.inner})
 
-#zipper face-time joinery
+#Zipper edge-type joinery with chamfer
+class EdgeZipperChamfer(Joinery):
+	def __init__(self,l,mat_thick,outer,inner):
+		self.female_overshoot = 2.5*mat_thick
+		self.male_overshoot = 2.5*mat_thick
+		width = 1.5*mat_thick + max(self.female_overshoot,self.male_overshoot)
+		Joinery.__init__(self,l,mat_thick,outer,inner,-.5*mat_thick,width)
+	def unit(self):
+		m = self.mat_thick
+		chamf = 1.*m #chamfering
+		os = .75*m #preload offsetting
+		fosh = self.female_overshoot
+		mosh = self.male_overshoot
+		slot_tol = -.0075 #how much longer is slot than tab?
+		#TODO: expose zipper params
+		#TODO: fold together edge zippers
+		pl = Polyline(asarray([	
+			[-.5*m,0],
+			[-.5*m,.1],
+			[1.5*m+mosh-chamf,.1],
+			[1.5*m+mosh,.1+chamf],
+			[1.5*m+mosh,.4-chamf],
+			[1.5*m+mosh-chamf,.4],
+			[-.5*m,.4],
+			[-.5*m,.53],
+			[1.5*m+fosh,.53],
+			[1.5*m+fosh,.97],
+			[-.5*m,.97],
+			[-.5*m,1.]]),
+			False
+			)
+		pl2 = Polyline(asarray([
+			[-.5*m-os,.6-slot_tol],
+			[.5*m-os,.6-slot_tol],
+			[.5*m-os,.9+slot_tol],
+			[-.5*m-os,.9+slot_tol]]),
+			closed=True
+			)
+		return Group({pl:self.outer,pl2:self.inner})
+
+#zipper face-type joinery
 class FaceZipper(Joinery):
 	def __init__(self,l,mat_thick,outer,inner):
-		Joinery.__init__(self,l,mat_thick,outer,inner,None)
+		Joinery.__init__(self,l,mat_thick,outer,inner,None,1.5*mat_thick)
 	def unit(self):
 		m = self.mat_thick
 		hole = Polyline(asarray([	
@@ -122,6 +177,8 @@ class FaceZipper(Joinery):
 			closed=True)
 		return Group({hole:self.inner, tab_hole:self.inner})	
 
+
+#TODO: consider digital thread!
 
 
 
