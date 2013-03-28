@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #spline
-from shapes import *
+from shape import *
 
 class CubicBezier(Shape):
     def __init__(self,p0,p1,p2,p3):
@@ -9,7 +9,7 @@ class CubicBezier(Shape):
         self.p2 = asarray(p2)
         self.p3 = asarray(p3)
         key = (p0[0],p0[1],p1[0],p1[1],p2[0],p2[1],p3[0],p3[1])
-        Shape.__init__('spline',key)
+        Shape.__init__(self,'spline',key)
     def __repr__(self):
         return 'CubicBezier['+','.join(['[%f,%f]'%tuple(p) for p in [self.p0,self.p1,self.p2,self.p3]]) + ']'
     def mirror(self,p,v): 

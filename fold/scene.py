@@ -3,7 +3,7 @@
 #with influence from http://code.activestate.com/recipes/325823-draw-svg-images-in-python/
 
 import os,sys
-from numpy import float64
+from numpy import *
 def colorstr(rgb): return "#%x%x%x" % (rgb[0]/16,rgb[1]/16,rgb[2]/16)
 
 class Scene:

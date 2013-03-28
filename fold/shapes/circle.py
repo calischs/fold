@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 #circle
-from shapes import *
+from shape import *
 
 class Circle(Shape):
     def __init__(self,center,radius):
         self.center = center
         self.radius = radius
         key = (center[0], center[1], radius)
-        Shape.__init__('circle',key)
+        Shape.__init__(self,'circle',key)
     def __repr__(self):
         return 'Circle([%f,%f],%f)'%(self.center[0],self.center[1],self.radius)
     def translate(self,v): 

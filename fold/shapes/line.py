@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #line
-from shapes import *
+from shape import *
+from polyline import *
 
 class Line(Shape):
     def __init__(self,start,end):

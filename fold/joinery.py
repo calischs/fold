@@ -2,9 +2,8 @@
 #joinery abstract class and children
 from numpy import *
 from geom import *
-from shapes import *
+from shapes.polyline import *
 from scene import *
-from Polyline import *
 
 class Joinery():
 	def __init__(self,l,mat_thick,outer,inner,connect_offset,width):

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #arc
-from shapes import *
+from shape import *
 
 class Arc(Shape):
     #draws an arc with center, radius, ccw from th1 to th2
@@ -11,7 +11,7 @@ class Arc(Shape):
         self.th1 = th1
         self.th2 = th2
         key = (center[0], center[1], radius, th1, th2)
-        Shape.__init__('arc',key)
+        Shape.__init__(self,'arc',key)
     def __repr__(self):
         return 'Arc([%f,%f],%f,%f,%f)'%(self.center[0],self.center[1],self.radius,self.th1,self.th2)
     def translate(self,v): 

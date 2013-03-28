@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 #polyline
-from shapes import *
+from shape import *
+from .. geom import *
 
 class Polyline(Shape):
     def __init__(self,points,closed=False):
         self.points = asarray(points)
         self.closed = closed
         key = tuple(list(ravel(self.points)))
-        Shape.__init__('polyline',key)
+        Shape.__init__(self,'polyline',key)
     def __repr__(self):
         return 'Polyline['+','.join(['[%f,%f]'%tuple(p) for p in self.points]) + ']'
     def mirror(self,p,v): 

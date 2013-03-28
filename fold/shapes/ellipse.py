@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #ellipse
-from shapes import *
+from shape import *
 
 class Ellipse(Shape):
     def __init__(self,center,xr,yr,rot):
@@ -9,7 +9,7 @@ class Ellipse(Shape):
         self.yr = yr
         self.rot = rot
         key = (center[0], center[1], xr, yr, rot)
-        Shape.__init__('ellipse',key)
+        Shape.__init__(self,'ellipse',key)
     def __repr__(self):
         return 'Ellipse([%f,%f],%f,%f,%f)'%(self.center[0],self.center[1],self.xr,self.yr,self.rot)
     def translate(self,v):
