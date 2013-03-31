@@ -34,7 +34,7 @@ class Joinery():
 			for item,layer in unit.items.iteritems():
 				assert(item.type == 'polyline') #for now
 				np = len(item.points)
-				new_pl = Polyline([])
+				new_pl = Polyline([],closed=item.closed)
 				for i in range(np if item.closed else np-1):
 					p0 = item.points[i]
 					p1 = item.points[(i+1)%np]
@@ -44,8 +44,8 @@ class Joinery():
 						e = t+ds*p1[1]
 						sub_pl = pl.sub(s, e).offset(p0[0],side)
 						#this is sloppy at edges...
-						#g.add({sub_pl:layer})
-						new_pl.add_points(sub_pl.points)
+						new_points = sub_pl.points if d[1]>0 else sub_pl.points[::-1]
+						new_pl.add_points(new_points)
 					elif d[1]==0:
 						q0 = pl.offset_p( t+ds*p0[1],p0[0],side)
 						q1 = pl.offset_p( t+ds*p1[1],p1[0],side)
@@ -114,27 +114,28 @@ class EdgeZipper(Joinery):
 #Zipper edge-type joinery with chamfer
 class EdgeZipperChamfer(Joinery):
 	def __init__(self,l,mat_thick,outer,inner):
-		self.female_overshoot = 2.5*mat_thick
-		self.male_overshoot = 2.5*mat_thick
+		self.female_overshoot = .5*mat_thick
+		self.male_overshoot = .5*mat_thick
 		width = 1.5*mat_thick + max(self.female_overshoot,self.male_overshoot)
 		Joinery.__init__(self,l,mat_thick,outer,inner,-.5*mat_thick,width)
 	def unit(self):
 		m = self.mat_thick
+		tab_hw = .1
 		chamf = 1.*m #chamfering
-		os = .75*m #preload offsetting
+		os = .25*m #preload offsetting
 		fosh = self.female_overshoot
 		mosh = self.male_overshoot
-		slot_tol = -.0075 #how much longer is slot than tab?
+		slot_tol = -.0075#how much longer is slot than tab?
 		#TODO: expose zipper params
 		#TODO: fold together edge zippers
 		pl = Polyline(asarray([	
 			[-.5*m,0],
-			[-.5*m,.1],
-			[1.5*m+mosh-chamf,.1],
-			[1.5*m+mosh,.1+chamf],
-			[1.5*m+mosh,.4-chamf],
-			[1.5*m+mosh-chamf,.4],
-			[-.5*m,.4],
+			[-.5*m,.25-tab_hw],
+			[1.5*m+mosh-chamf,.25-tab_hw],
+			[1.5*m+mosh,.25-tab_hw+chamf],
+			[1.5*m+mosh,.25+tab_hw-chamf],
+			[1.5*m+mosh-chamf,.25+tab_hw],
+			[-.5*m,.25+tab_hw],
 			[-.5*m,.53],
 			[1.5*m+fosh,.53],
 			[1.5*m+fosh,.97],
@@ -143,10 +144,10 @@ class EdgeZipperChamfer(Joinery):
 			False
 			)
 		pl2 = Polyline(asarray([
-			[-.5*m-os,.6-slot_tol],
-			[.5*m-os,.6-slot_tol],
-			[.5*m-os,.9+slot_tol],
-			[-.5*m-os,.9+slot_tol]]),
+			[-.5*m-os,.75-tab_hw-slot_tol],
+			[.5*m-os,.75-tab_hw-slot_tol],
+			[.5*m-os,.75+tab_hw+slot_tol],
+			[-.5*m-os,.75+tab_hw+slot_tol]]),
 			closed=True
 			)
 		return Group({pl:self.outer,pl2:self.inner})

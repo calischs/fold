@@ -11,6 +11,12 @@ class Polyline(Shape):
         Shape.__init__(self,'polyline',key)
     def __repr__(self):
         return 'Polyline['+','.join(['[%f,%f]'%tuple(p) for p in self.points]) + ']'
+    def __add__(self,other):
+        if close(self.points[-1],other.points[0],1e-4):
+            p1 = self.points[:-1]
+        else:
+            p1 = self.points
+        return Polyline(vstack((p1,other.points)),closed=self.closed)
     def mirror(self,p,v): 
         new_points = []
         for pp in self.points:
@@ -99,8 +105,8 @@ class Polyline(Shape):
                 #central difference when possible   
                 p = self.points[(i+1)%n] - self.points[(i+n-1)%n]
             p = rotate_p(p,[0,0],angle)
-            #if mag(p)==0:
-            #    print 'zero mag',self.points
+            if mag(p)==0:
+                print 'zero mag',self.points
             p /= mag(p)
             norms.append(p)
         return norms
